@@ -1,5 +1,11 @@
 /*  Author: Saiteja.
-    Project: IND_LF->Proto
+    Project: Industrial_Line_Follower->Proto
+    Programming Lang: Embedded C
+    Controller: ESP32 
+    Wireless: WiFi Access point
+    control: Local Web server
+    client: Aries solutions pvt ltd
+    code access: https://github.com/saitez/Aries_Line_Follower
     Date:31-10-2023
 */
 #include <stdio.h>
@@ -130,7 +136,7 @@ void wifi_init_softap(void)
              ARIES_WIFI_SSID, ARIES_WIFI_PASS, ARIES_ESP_WIFI_CHANNEL);
 }
 
-esp_err_t send_web_page(httpd_req_t *req)
+esp_err_t m1_send_web_page(httpd_req_t *req)
 {
     int response;
     
@@ -145,7 +151,7 @@ esp_err_t send_web_page(httpd_req_t *req)
     return response;
 }
 
-esp_err_t send_web_page2(httpd_req_t *req)
+esp_err_t m2_send_web_page(httpd_req_t *req)
 {
     int response;
     
@@ -156,7 +162,7 @@ esp_err_t send_web_page2(httpd_req_t *req)
        
     return response;
 }
-esp_err_t send_web_page3(httpd_req_t *req)
+esp_err_t m3_send_web_page(httpd_req_t *req)
 {
     int response;
     
@@ -166,7 +172,7 @@ esp_err_t send_web_page3(httpd_req_t *req)
        
     return response;
 }
-esp_err_t send_web_page4(httpd_req_t *req)
+esp_err_t m4_send_web_page(httpd_req_t *req)
 {
     int response;
     
@@ -176,7 +182,7 @@ esp_err_t send_web_page4(httpd_req_t *req)
        
     return response;
 }
-esp_err_t send_web_page5(httpd_req_t *req)
+esp_err_t stop_send_web_page(httpd_req_t *req)
 {
     int response;
     
@@ -188,21 +194,42 @@ esp_err_t send_web_page5(httpd_req_t *req)
 }
 esp_err_t get_req_handler(httpd_req_t *req)
 {
-    return send_web_page(req);
+    return stop_send_web_page(req);
 }
 
-esp_err_t led_on_handler(httpd_req_t *req)
+esp_err_t m1_on_handler(httpd_req_t *req)
 {
+    ESP_LOGI(TAG, "M1-ON");
     gpio_set_level(LED_PIN, 1);
-    led_state = 1;
-    return send_web_page(req);
+    return m1_send_web_page(req);
 }
 
-esp_err_t led_off_handler(httpd_req_t *req)
+esp_err_t m2_on_handler(httpd_req_t *req)
 {
+    ESP_LOGI(TAG, "M2-ON");
     gpio_set_level(LED_PIN, 0);
-    led_state = 0;
-    return send_web_page5(req);
+    return m2_send_web_page(req);
+}
+
+esp_err_t m3_on_handler(httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "M3-ON");
+    gpio_set_level(LED_PIN, 1);
+    return m3_send_web_page(req);
+}
+
+esp_err_t m4_on_handler(httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "M4-ON");
+    gpio_set_level(LED_PIN, 0);
+    return m4_send_web_page(req);
+}
+
+esp_err_t stop_handler(httpd_req_t *req)
+{
+    ESP_LOGI(TAG, "STOP");
+    gpio_set_level(LED_PIN, 1);
+    return stop_send_web_page(req);
 }
 
 httpd_uri_t uri_get = {
@@ -214,32 +241,32 @@ httpd_uri_t uri_get = {
 httpd_uri_t m1_on = {
     .uri = "/M1on",
     .method = HTTP_GET,
-    .handler = led_on_handler,
+    .handler = m1_on_handler,
     .user_ctx = NULL};
 
     httpd_uri_t uri_stop = {
     .uri = "/STP",
     .method = HTTP_GET,
-    .handler = led_off_handler,
+    .handler = stop_handler,
     .user_ctx = NULL};
 
 
 httpd_uri_t m2_on = {
     .uri = "/M2on",
     .method = HTTP_GET,
-    .handler = led_off_handler,
+    .handler = m2_on_handler,
     .user_ctx = NULL};
 
 httpd_uri_t m3_on = {
     .uri = "/M3on",
     .method = HTTP_GET,
-    .handler = led_off_handler,
+    .handler = m3_on_handler,
     .user_ctx = NULL};
 
 httpd_uri_t m4_on = {
     .uri = "/M4on",
     .method = HTTP_GET,
-    .handler = led_off_handler,
+    .handler = m4_on_handler,
     .user_ctx = NULL};
 
 
@@ -275,10 +302,10 @@ void app_main(void)
 
     ESP_LOGI(TAG, "WIFI_MODE_AP");
     wifi_init_softap();
-    //gpio_pad_select_gpio(LED_PIN);
+    esp_rom_gpio_pad_select_gpio(LED_PIN);
     gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 
-    led_state = 0;
+    //led_state = 0;
     ESP_LOGI(TAG, "LF Web Server is running ... ...\n");
     setup_server();
 }
