@@ -63,6 +63,55 @@ static const char *TAG = "Aries_Line_Follower";
 #define LED_PIN 2
 #endif
 
+
+/*User-defined enum control Error states*/
+typedef enum Error_States
+{
+    FAILURE =0x00,
+    SUCCESS
+}error_st;
+
+/*User-defined enum control finite state_machine motor commands*/
+typedef enum Motor_CMD
+{
+    STOP =0x00,
+    START
+}motor_cmd;
+
+/*User-defined enum finite state_machine motor states*/
+typedef enum Motor_States
+{
+   MOTOR_OFF =0x00,
+   MOTOR_ON
+
+}motor_states;
+
+/*User-defined enum finite state_machine machine type*/
+typedef enum Machine_Type
+{
+   MACHINE_1 =0x01,
+   MACHINE_2,
+   MACHINE_3,
+   MACHINE_4
+}mach_typ;
+
+/*User-defined enum finite state_machine motor direction*/
+typedef enum Motor_Direction
+{
+   FORWARD =0x01,
+   BACKWARD,
+   LEFT,
+   RIGHT
+}motor_dir;
+
+
+/*Function proto-types for FSM control*/
+error_st Motor_cmd(motor_cmd cmd);
+error_st Motor_state(motor_states states);
+error_st Machine_type(mach_typ type);
+error_st Motor_Dir_update(motor_dir direction);
+
+
 /*char array's  define's HTML code to ON/OFF channels M1, M2, M3, M4 and STOP*/ 
 char M1_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M1</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
 char M2_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M2</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
@@ -151,6 +200,72 @@ void wifi_init_softap(void)
              ARIES_WIFI_SSID, ARIES_WIFI_PASS, ARIES_ESP_WIFI_CHANNEL);
 }
 
+/*Brief function handles machine type*/
+/*function arguments MACHINE_1/2/3/4 */
+/*error_st Machine_type(mach_typ type) returns SUCCESS/FAILURE */
+error_st Machine_type(mach_typ type)
+{
+    uint8_t mach_typ=type;
+    uint8_t err_code;
+
+    switch (mach_typ)
+    {
+        case MACHINE_1:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "M1-ON SWITCH CASE");
+        break;
+        case MACHINE_2:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "M2-ON SWITCH CASE");
+        break;
+        case MACHINE_3:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "M3-ON SWITCH CASE");
+        break;
+        case MACHINE_4:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "M4-ON SWITCH CASE");
+        break;
+        
+        default:
+        err_code = FAILURE;
+        ESP_LOGI(TAG, "OFF SWITCH CASE");
+        break;
+           
+    }
+    return err_code;
+   
+}
+
+/*Brief function handles motor command*/
+/*function arguments START/STOP */
+/*error_st Machine_type(mach_typ type) returns SUCCESS/FAILURE */
+error_st Motor_cmd(motor_cmd cmd)
+{
+    uint8_t motor_cmd=cmd;
+    uint8_t err_code;
+    switch (motor_cmd)
+    {
+        case STOP:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "STOP SWITCH CASE");
+        break;
+        case START:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "START");
+        break;
+        
+        default:
+        err_code = FAILURE;
+        ESP_LOGI(TAG, "OFF SWITCH CASE");
+        break;
+           
+    }
+    return err_code;
+   
+}
+
+
 esp_err_t m1_send_web_page(httpd_req_t *req)
 {
     int response;
@@ -196,6 +311,10 @@ esp_err_t get_req_handler(httpd_req_t *req)
 esp_err_t m1_on_handler(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "M1-ON");
+    if(Machine_type(MACHINE_1)!=SUCCESS)
+    {
+        ESP_LOGI(TAG, "M1 Failed to ON");
+    }
     gpio_set_level(LED_PIN, 1);
     
     return m1_send_web_page(req);
@@ -204,6 +323,10 @@ esp_err_t m1_on_handler(httpd_req_t *req)
 esp_err_t m2_on_handler(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "M2-ON");
+    if(Machine_type(MACHINE_2)!=SUCCESS)
+    {
+        ESP_LOGI(TAG, "M2 Failed to ON");
+    }
     gpio_set_level(LED_PIN, 0);
     
     return m2_send_web_page(req);
@@ -212,6 +335,10 @@ esp_err_t m2_on_handler(httpd_req_t *req)
 esp_err_t m3_on_handler(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "M3-ON");
+    if(Machine_type(MACHINE_3)!=SUCCESS)
+    {
+        ESP_LOGI(TAG, "M3 Failed to ON");
+    }
     gpio_set_level(LED_PIN, 1);
     
     return m3_send_web_page(req);
@@ -220,6 +347,10 @@ esp_err_t m3_on_handler(httpd_req_t *req)
 esp_err_t m4_on_handler(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "M4-ON");
+    if(Machine_type(MACHINE_4)!=SUCCESS)
+    {
+        ESP_LOGI(TAG, "M4 Failed to ON");
+    }
     gpio_set_level(LED_PIN, 0);
     
     return m4_send_web_page(req);
@@ -228,6 +359,10 @@ esp_err_t m4_on_handler(httpd_req_t *req)
 esp_err_t stop_handler(httpd_req_t *req)
 {
     ESP_LOGI(TAG, "STOP");
+    if(Motor_cmd(STOP)!=SUCCESS)
+    {
+        ESP_LOGI(TAG, "STOP command failed");
+    }
     gpio_set_level(LED_PIN, 1);
     
     return stop_send_web_page(req);
