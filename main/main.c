@@ -64,6 +64,11 @@ static const char *TAG = "Aries_Line_Follower";
 #endif
 
 
+/*Macro define's for test IR states*/ 
+#define IR_STATE_HIGH 1
+#define IR_STATE_LOW  0
+
+
 /*User-defined enum control Error states*/
 typedef enum Error_States
 {
@@ -104,12 +109,25 @@ typedef enum Motor_Direction
    RIGHT
 }motor_dir;
 
+/*User-defined enum finite state_machine for IR_Sensor selecion*/
+typedef enum IR_Sensor
+{
+   IR_SENSOR_1 =0x01,
+   IR_SENSOR_2,
+   IR_SENSOR_3,
+   IR_SENSOR_4,
+   IR_SENSOR_5
+}ir_sens;
+
+
 
 /*Function proto-types for FSM control*/
 error_st Motor_cmd(motor_cmd cmd);
 error_st Motor_state(motor_states states);
 error_st Machine_type(mach_typ type);
 error_st Motor_Dir_update(motor_dir direction);
+error_st Ir_Sens_selection(ir_sens selection);
+
 
 
 /*char array's  define's HTML code to ON/OFF channels M1, M2, M3, M4 and STOP*/ 
