@@ -44,16 +44,15 @@
 static const char *TAG = "Aries_Line_Follower";
 
 /*Macro's define's PWM pins to control motors*/ 
-#define ARIES_PWM_MOTOR_M1_PIN  24
-#define ARIES_PWM_MOTOR_M2_PIN  25
+#define ARIES_PWM_MOTOR_M1_PIN  25
+#define ARIES_PWM_MOTOR_M2_PIN  26
 
 /*Macro's define's I/O Digital pins for IR sensors*/ 
-#define ARIES_IR_SENSOR_PIN_1  3
-#define ARIES_IR_SENSOR_PIN_2  4
-#define ARIES_IR_SENSOR_PIN_3  5
-#define ARIES_IR_SENSOR_PIN_4  6
-#define ARIES_IR_SENSOR_PIN_5  7
-#define ARIES_IR_SENSOR_PIN_6  8
+#define ARIES_IR_SENSOR_PIN_1  18
+#define ARIES_IR_SENSOR_PIN_2  19
+#define ARIES_IR_SENSOR_PIN_3  21
+#define ARIES_IR_SENSOR_PIN_4  22
+#define ARIES_IR_SENSOR_PIN_5  23
 
 /* Control Macro */ 
 #define LED_TEST 1
@@ -68,6 +67,8 @@ static const char *TAG = "Aries_Line_Follower";
 #define IR_STATE_HIGH 1
 #define IR_STATE_LOW  0
 
+/*Global variables*/
+uint8_t sens_1,sens_2,sens_3,sens_4,sens_5;
 
 /*User-defined enum control Error states*/
 typedef enum Error_States
@@ -218,6 +219,48 @@ void wifi_init_softap(void)
              ARIES_WIFI_SSID, ARIES_WIFI_PASS, ARIES_ESP_WIFI_CHANNEL);
 }
 
+
+
+/*Brief function handles IR sensor selection*/
+/*function arguments IR_SENSOR_1/2/3/4/5 */
+/*error_st Ir_Sens_selection(ir_sens selection) returns SUCCESS/FAILURE */
+error_st Ir_Sens_selection(ir_sens selection)
+{
+    uint8_t ir_sens=selection;
+    uint8_t err_code;
+    switch (ir_sens)
+    {
+        case IR_SENSOR_1:
+        sens_1 = gpio_get_level(ARIES_IR_SENSOR_PIN_1);
+        err_code = SUCCESS;
+        break;
+        case IR_SENSOR_2:
+        sens_2 = gpio_get_level(ARIES_IR_SENSOR_PIN_2);
+        err_code = SUCCESS;
+        break;
+        case IR_SENSOR_3:
+        sens_3 = gpio_get_level(ARIES_IR_SENSOR_PIN_3);
+        err_code = SUCCESS;
+        break;
+        case IR_SENSOR_4:
+        sens_4 = gpio_get_level(ARIES_IR_SENSOR_PIN_4);
+        err_code = SUCCESS;
+        break;
+        case IR_SENSOR_5:
+        sens_5 = gpio_get_level(ARIES_IR_SENSOR_PIN_5);
+        err_code = SUCCESS;
+        break;
+
+        default:
+        err_code = FAILURE;
+        ESP_LOGI(TAG, "No sensor selected");
+        break;
+    }
+    return err_code;
+
+}
+
+
 /*Brief function handles machine type*/
 /*function arguments MACHINE_1/2/3/4 */
 /*error_st Machine_type(mach_typ type) returns SUCCESS/FAILURE */
@@ -229,19 +272,19 @@ error_st Machine_type(mach_typ type)
     switch (mach_typ)
     {
         case MACHINE_1:
-        err_code = SUCCESS;
+        err_code = Ir_Sens_selection(IR_SENSOR_1);
         ESP_LOGI(TAG, "M1-ON SWITCH CASE");
         break;
         case MACHINE_2:
-        err_code = SUCCESS;
+        err_code = Ir_Sens_selection(IR_SENSOR_2);
         ESP_LOGI(TAG, "M2-ON SWITCH CASE");
         break;
         case MACHINE_3:
-        err_code = SUCCESS;
+        err_code = Ir_Sens_selection(IR_SENSOR_3);
         ESP_LOGI(TAG, "M3-ON SWITCH CASE");
         break;
         case MACHINE_4:
-        err_code = SUCCESS;
+        err_code = Ir_Sens_selection(IR_SENSOR_4);
         ESP_LOGI(TAG, "M4-ON SWITCH CASE");
         break;
         
@@ -257,7 +300,7 @@ error_st Machine_type(mach_typ type)
 
 /*Brief function handles motor command*/
 /*function arguments START/STOP */
-/*error_st Machine_type(mach_typ type) returns SUCCESS/FAILURE */
+/*error_st Motor_cmd(motor_cmd cmd) returns SUCCESS/FAILURE */
 error_st Motor_cmd(motor_cmd cmd)
 {
     uint8_t motor_cmd=cmd;
@@ -333,7 +376,7 @@ esp_err_t m1_on_handler(httpd_req_t *req)
     {
         ESP_LOGI(TAG, "M1 Failed to ON");
     }
-    gpio_set_level(LED_PIN, 1);
+   
     
     return m1_send_web_page(req);
 }
@@ -345,7 +388,7 @@ esp_err_t m2_on_handler(httpd_req_t *req)
     {
         ESP_LOGI(TAG, "M2 Failed to ON");
     }
-    gpio_set_level(LED_PIN, 0);
+   
     
     return m2_send_web_page(req);
 }
@@ -357,7 +400,7 @@ esp_err_t m3_on_handler(httpd_req_t *req)
     {
         ESP_LOGI(TAG, "M3 Failed to ON");
     }
-    gpio_set_level(LED_PIN, 1);
+   
     
     return m3_send_web_page(req);
 }
@@ -369,8 +412,7 @@ esp_err_t m4_on_handler(httpd_req_t *req)
     {
         ESP_LOGI(TAG, "M4 Failed to ON");
     }
-    gpio_set_level(LED_PIN, 0);
-    
+     
     return m4_send_web_page(req);
 }
 
@@ -381,7 +423,6 @@ esp_err_t stop_handler(httpd_req_t *req)
     {
         ESP_LOGI(TAG, "STOP command failed");
     }
-    gpio_set_level(LED_PIN, 1);
     
     return stop_send_web_page(req);
 }
@@ -444,6 +485,34 @@ httpd_handle_t setup_server(void)
     return server;
 }
 
+/*Brief function handles test LED init*/
+/*function arguments NONE */
+/*void Led_test_init() returns NONE */
+void Led_test_init()
+{
+    esp_rom_gpio_pad_select_gpio(LED_PIN);
+    gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
+    ESP_LOGI(TAG, "Test Led init success\n");
+}
+
+/*Brief function handles test IR sensor init*/
+/*function arguments NONE */
+/*void IR_sensor_init() returns NONE */
+void IR_sensor_init()
+{
+    esp_rom_gpio_pad_select_gpio(ARIES_IR_SENSOR_PIN_1);
+    gpio_set_direction(ARIES_IR_SENSOR_PIN_1, GPIO_MODE_INPUT);
+    esp_rom_gpio_pad_select_gpio(ARIES_IR_SENSOR_PIN_2);
+    gpio_set_direction(ARIES_IR_SENSOR_PIN_2, GPIO_MODE_INPUT);
+    esp_rom_gpio_pad_select_gpio(ARIES_IR_SENSOR_PIN_3);
+    gpio_set_direction(ARIES_IR_SENSOR_PIN_3, GPIO_MODE_INPUT);
+    esp_rom_gpio_pad_select_gpio(ARIES_IR_SENSOR_PIN_4);
+    gpio_set_direction(ARIES_IR_SENSOR_PIN_4, GPIO_MODE_INPUT);
+    esp_rom_gpio_pad_select_gpio(ARIES_IR_SENSOR_PIN_5);
+    gpio_set_direction(ARIES_IR_SENSOR_PIN_5, GPIO_MODE_INPUT);
+    ESP_LOGI(TAG, "All sensor pins init success\n");
+}
+
 void app_main(void)
 {
     //Initialize NVS
@@ -456,9 +525,12 @@ void app_main(void)
 
     ESP_LOGI(TAG, "WIFI_MODE_AP");
     wifi_init_softap();
-    esp_rom_gpio_pad_select_gpio(LED_PIN);
-    gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 
+#ifdef LED_TEST
+ Led_test_init();
+#endif
+
+    IR_sensor_init();
     ESP_LOGI(TAG, "LF Web Server is running ... ...\n");
     setup_server();
 }
