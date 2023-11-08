@@ -63,7 +63,7 @@ static const char *TAG = "Aries_Line_Follower";
 #endif
 
 
-/*Macro define's for test IR states*/ 
+/*Macro's define for test IR states*/ 
 #define IR_STATE_HIGH 1
 #define IR_STATE_LOW  0
 
@@ -227,27 +227,33 @@ void wifi_init_softap(void)
 error_st Ir_Sens_selection(ir_sens selection)
 {
     uint8_t ir_sens=selection;
-    uint8_t err_code;
+    uint8_t err_code/*,curr_state,prev_state*/;
     switch (ir_sens)
     {
         case IR_SENSOR_1:
         sens_1 = gpio_get_level(ARIES_IR_SENSOR_PIN_1);
+        // curr_state = sens_1;
+        ESP_LOGI(TAG, "IR_SENSOR_1 :%d",sens_1);
         err_code = SUCCESS;
         break;
         case IR_SENSOR_2:
         sens_2 = gpio_get_level(ARIES_IR_SENSOR_PIN_2);
+        ESP_LOGI(TAG, "IR_SENSOR_2 :%d",sens_2);
         err_code = SUCCESS;
         break;
         case IR_SENSOR_3:
         sens_3 = gpio_get_level(ARIES_IR_SENSOR_PIN_3);
+        ESP_LOGI(TAG, "IR_SENSOR_3 :%d",sens_3);
         err_code = SUCCESS;
         break;
         case IR_SENSOR_4:
         sens_4 = gpio_get_level(ARIES_IR_SENSOR_PIN_4);
+        ESP_LOGI(TAG, "IR_SENSOR_4 :%d",sens_4);
         err_code = SUCCESS;
         break;
         case IR_SENSOR_5:
         sens_5 = gpio_get_level(ARIES_IR_SENSOR_PIN_5);
+        ESP_LOGI(TAG, "IR_SENSOR_5 :%d",sens_5);
         err_code = SUCCESS;
         break;
 
@@ -273,18 +279,22 @@ error_st Machine_type(mach_typ type)
     {
         case MACHINE_1:
         err_code = Ir_Sens_selection(IR_SENSOR_1);
+        err_code = Ir_Sens_selection(IR_SENSOR_5);
         ESP_LOGI(TAG, "M1-ON SWITCH CASE");
         break;
         case MACHINE_2:
         err_code = Ir_Sens_selection(IR_SENSOR_2);
+        err_code = Ir_Sens_selection(IR_SENSOR_5);
         ESP_LOGI(TAG, "M2-ON SWITCH CASE");
         break;
         case MACHINE_3:
         err_code = Ir_Sens_selection(IR_SENSOR_3);
+        err_code = Ir_Sens_selection(IR_SENSOR_5);
         ESP_LOGI(TAG, "M3-ON SWITCH CASE");
         break;
         case MACHINE_4:
         err_code = Ir_Sens_selection(IR_SENSOR_4);
+        err_code = Ir_Sens_selection(IR_SENSOR_5);
         ESP_LOGI(TAG, "M4-ON SWITCH CASE");
         break;
         
