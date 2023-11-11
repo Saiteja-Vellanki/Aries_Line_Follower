@@ -34,7 +34,8 @@
 #include "driver/gpio.h"
 #include "esp_app_desc.h"
 #include <inttypes.h> 
-
+#include "driver/mcpwm.h"
+#include "soc/mcpwm_periph.h"
 
 /*Macro define's wifi SSID*/ 
 #define ARIES_WIFI_SSID            "Aries_LF"
@@ -81,6 +82,9 @@ uint8_t gf_1,gf_2,gf_3,gf_4,gf_5;
 
 /*Complete project details*/
 const esp_app_desc_t *app_desc = NULL;
+
+static void motor_control_1(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
+static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
 
 /*User-defined enum control Error states*/
 typedef enum Error_States
@@ -397,6 +401,20 @@ error_st Motor_state(motor_states states)
    
 }
 
+static void motor_control_1(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle)
+{
+    mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_A);
+    mcpwm_set_duty(mcpwm_num, timer_num, MCPWM_OPR_A, duty_cycle);
+    mcpwm_set_duty_type(mcpwm_num, timer_num, MCPWM_OPR_A, MCPWM_DUTY_MODE_0);
+}
+
+static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle)
+{
+    mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_B);
+    mcpwm_set_duty(mcpwm_num, timer_num, MCPWM_OPR_B, duty_cycle);
+    mcpwm_set_duty_type(mcpwm_num, timer_num, MCPWM_OPR_B, MCPWM_DUTY_MODE_0);
+}
+    
 
 esp_err_t m1_send_web_page(httpd_req_t *req)
 {
@@ -593,6 +611,9 @@ void Machine_processing_task(void *pvParameter)
             /*Processing Target-> Machine-1*/
             Ir_Sens_selection(IR_SENSOR_1);
             Ir_Sens_selection(IR_SENSOR_2);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 90);
+
         }
         else if(gf_2 == 1)
         {
@@ -629,6 +650,33 @@ void app_proj_details()
     ESP_EARLY_LOGI(TAG, "Secure version:   %d", app_desc->secure_version);
     ESP_EARLY_LOGI(TAG, "Compile time:     %s %s", app_desc->date, app_desc->time);
 }
+
+static void mcpwm_gpio_initialize(void)
+{
+    printf("Aries initializing mcpwm gpio...\n");
+    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, ARIES_PWM_MOTOR_M1_PIN);
+    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, ARIES_PWM_MOTOR_M2_PIN);
+}
+
+void mcpwm_control(void)
+{
+  
+    //1. mcpwm gpio initialization
+    mcpwm_gpio_initialize();
+
+    //2. initial mcpwm configuration
+    printf("Configuring Initial Parameters of mcpwm...\n");
+    mcpwm_config_t pwm_config;
+    pwm_config.frequency =16000;    //frequency = 1kHz,
+    pwm_config.cmpr_a = 0;    //duty cycle of PWMxA = 0
+    pwm_config.cmpr_b = 0;    //duty cycle of PWMxb = 0
+    pwm_config.counter_mode = MCPWM_UP_COUNTER;
+    pwm_config.duty_mode =MCPWM_DUTY_MODE_0;
+    mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);    
+    mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_config);    
+    
+}
+
 void app_main(void)
 {
     //Initialize NVS
@@ -649,5 +697,6 @@ void app_main(void)
     IR_sensor_init();
     ESP_LOGI(TAG, "LF Web Server is running ... ...\n");
     setup_server();
+    mcpwm_control();
     xTaskCreate(&Machine_processing_task, "task_run", 1024 * 5, NULL, 3 , NULL); 
 }
