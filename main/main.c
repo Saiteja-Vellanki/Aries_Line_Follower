@@ -59,32 +59,21 @@ static const char *TAG = "Aries_Line_Follower";
 #define ARIES_IR_SENSOR_PIN_4  22
 #define ARIES_IR_SENSOR_PIN_5  23
 
-/* Control Macro */ 
+/* Control Macro's */ 
 #define LED_TEST 1
+//#define PROJ_DET 1
+#define DEBUG_LEVEL_xx1 1
+#define DEBUG_LEVEL_xx2 1
+#define DEBUG_LEVEL_xx3 1
 
 /*Macro define's for test LED*/ 
 #ifdef  LED_TEST
 #define LED_PIN 2
 #endif
 
-
 /*Macro's define for test IR states*/ 
 #define IR_STATE_HIGH 1
 #define IR_STATE_LOW  0
-
-/*Global variables*/
-
-/*Sensor output global variable*/
-uint8_t sens_1,sens_2,sens_3,sens_4,sens_5;
-
-/*Machine selection global flag*/
-uint8_t gf_1,gf_2,gf_3,gf_4,gf_5;
-
-/*Complete project details*/
-const esp_app_desc_t *app_desc = NULL;
-
-static void motor_control_1(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
-static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
 
 /*User-defined enum control Error states*/
 typedef enum Error_States
@@ -135,16 +124,29 @@ typedef enum IR_Sensor
    IR_SENSOR_4,
    IR_SENSOR_5
 }ir_sens;
+/*Global variables*/
 
+/*Sensor output global variable*/
+uint8_t sens_1,sens_2,sens_3,sens_4,sens_5;
 
+/*Machine selection global flag*/
+uint8_t gf_1,gf_2,gf_3,gf_4,gf_5;
+
+/*Complete project details Name, version etc*/
+const esp_app_desc_t *app_desc = NULL;
 
 /*Function proto-types for FSM control*/
 error_st Motor_cmd(motor_cmd cmd);
 error_st Motor_state(motor_states states);
 error_st Machine_type(mach_typ type);
-error_st Motor_Dir_update(motor_dir direction);
+error_st Motor_Dir_update(mach_typ type, motor_dir direction);
 error_st Ir_Sens_selection(ir_sens selection);
 
+/*Function proto-types for Motor control*/
+static void motor_control_1(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
+static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
+static void manual_motor_stop(void);
+static void auto_motor_stop(void);
 
 
 /*char array's  define's HTML code to ON/OFF channels M1, M2, M3, M4 and STOP*/ 
@@ -185,12 +187,18 @@ static void wifi_event_handler(void* arg, esp_event_base_t event_base,
 {
     if (event_id == WIFI_EVENT_AP_STACONNECTED) {
         wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
+#ifdef DEBUG_LEVEL_xx1
         ESP_LOGI(TAG, "station "MACSTR" join, AID=%d",
-                 MAC2STR(event->mac), event->aid);
+                MAC2STR(event->mac), event->aid);
+#endif
+
+        
     } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
         wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
+#ifdef DEBUG_LEVEL_xx1
         ESP_LOGI(TAG, "station "MACSTR" leave, AID=%d",
-                 MAC2STR(event->mac), event->aid);
+                MAC2STR(event->mac), event->aid);
+#endif
     }
 }
 
@@ -230,9 +238,10 @@ void wifi_init_softap(void)
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
-
+#ifdef DEBUG_LEVEL_xx1
     ESP_LOGI(TAG, "wifi_init_softap finished. SSID:%s password:%s channel:%d",
              ARIES_WIFI_SSID, ARIES_WIFI_PASS, ARIES_ESP_WIFI_CHANNEL);
+#endif
 }
 
 
@@ -248,33 +257,45 @@ error_st Ir_Sens_selection(ir_sens selection)
     {
         case IR_SENSOR_1:
         sens_1 = gpio_get_level(ARIES_IR_SENSOR_PIN_1);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "IR_SENSOR_1 :%d",sens_1);
+#endif
         err_code = SUCCESS;
         break;
         case IR_SENSOR_2:
         sens_2 = gpio_get_level(ARIES_IR_SENSOR_PIN_2);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "IR_SENSOR_2 :%d",sens_2);
+#endif
         err_code = SUCCESS;
         break;
         case IR_SENSOR_3:
         sens_3 = gpio_get_level(ARIES_IR_SENSOR_PIN_3);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "IR_SENSOR_3 :%d",sens_3);
+#endif
         err_code = SUCCESS;
         break;
         case IR_SENSOR_4:
         sens_4 = gpio_get_level(ARIES_IR_SENSOR_PIN_4);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "IR_SENSOR_4 :%d",sens_4);
+#endif
         err_code = SUCCESS;
         break;
         case IR_SENSOR_5:
         sens_5 = gpio_get_level(ARIES_IR_SENSOR_PIN_5);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "IR_SENSOR_5 :%d",sens_5);
+#endif
         err_code = SUCCESS;
         break;
 
         default:
         err_code = FAILURE;
+#ifdef DEBUG_LEVEL_xx3
         ESP_LOGI(TAG, "No sensor selected");
+#endif
         break;
     }
     return err_code;
@@ -294,50 +315,63 @@ error_st Machine_type(mach_typ type)
     {
         case MACHINE_1:
         Motor_cmd(START);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M1-ON SWITCH CASE");
+#endif
         gf_1 = 1;
         Motor_state(MOTOR_ON);
         gf_2 = 0;
         gf_3 = 0;
         gf_4 = 0;
+        gf_5 = 0;
         err_code = SUCCESS;
         break;
         case MACHINE_2:
         Motor_cmd(START);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M2-ON SWITCH CASE");
+#endif
         gf_1 = 0;
         gf_2 = 1;
         Motor_state(MOTOR_ON);
         gf_3 = 0;
         gf_4 = 0;
+        gf_5 = 0;
         err_code = SUCCESS;
         break;
         case MACHINE_3:
         Motor_cmd(START);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M3-ON SWITCH CASE");
+#endif
         gf_1 = 0;
         gf_2 = 0;
         gf_3 = 1;
         Motor_state(MOTOR_ON);
         gf_4 = 0;
+        gf_5 = 0;
         err_code = SUCCESS;
         break;
         case MACHINE_4:
         Motor_cmd(START);
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M4-ON SWITCH CASE");
+#endif
         gf_1 = 0;
         gf_2 = 0;
         gf_3 = 0;
         gf_4 = 1;
+        gf_5 = 0;
         Motor_state(MOTOR_ON);
         err_code = SUCCESS;
         break;
         
         default:
-        Motor_cmd(STOP);
         Motor_state(MOTOR_OFF);
         err_code = FAILURE;
-        ESP_LOGI(TAG, "OFF SWITCH CASE");
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "FAILURE");
+#endif
         break;
            
     }
@@ -355,17 +389,28 @@ error_st Motor_cmd(motor_cmd cmd)
     switch (motor_cmd)
     {
         case STOP:
+        gf_1 = 0;
+        gf_2 = 0;
+        gf_3 = 0;
+        gf_4 = 0;
+        gf_5 = 1;
         err_code = SUCCESS;
-        ESP_LOGI(TAG, "STOP SWITCH CASE");
+#ifdef DEBUG_LEVEL_xx2
+        ESP_LOGI(TAG, "MOTOR STOP");
+#endif
         break;
         case START:
         err_code = SUCCESS;
-        ESP_LOGI(TAG, "START");
+#ifdef DEBUG_LEVEL_xx2
+        ESP_LOGI(TAG, "MOTOR START");
+#endif
         break;
         
         default:
         err_code = FAILURE;
-        ESP_LOGI(TAG, "OFF SWITCH CASE");
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "FAILURE");
+#endif
         break;
            
     }
@@ -383,17 +428,24 @@ error_st Motor_state(motor_states states)
     switch (motor_state)
     {
         case MOTOR_OFF:
+        auto_motor_stop();
         err_code = SUCCESS;
-        ESP_LOGI(TAG, "MOTOR OFF");
+#ifdef DEBUG_LEVEL_xx2
+        ESP_LOGI(TAG, "AUTO MOTOR OFF");
+#endif
         break;
         case MOTOR_ON:
         err_code = SUCCESS;
+#ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "MOTOR ON");
+#endif
         break;
         
         default:
         err_code = FAILURE;
-        ESP_LOGI(TAG, "OFF SWITCH CASE");
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "FAILURE");
+#endif
         break;
            
     }
@@ -401,6 +453,83 @@ error_st Motor_state(motor_states states)
    
 }
 
+error_st Motor_Dir_update(mach_typ type, motor_dir direction)
+{
+    uint8_t motor_type=type;
+    uint8_t motor_dir=direction;
+    uint8_t err_code;
+
+    switch (direction)
+    {
+        case FORWARD:
+        err_code = SUCCESS;
+#ifdef DEBUG_LEVEL_xx2
+        ESP_LOGI(TAG, "FORWARD");
+#endif
+        break;
+        case BACKWARD:
+        err_code = SUCCESS;
+#ifdef DEBUG_LEVEL_xx2
+        ESP_LOGI(TAG, "BACKWARD");
+#endif
+        break;
+        case LEFT:
+        err_code = SUCCESS;
+#ifdef DEBUG_LEVEL_xx2
+        ESP_LOGI(TAG, "LEFT");
+#endif
+        break;
+        case RIGHT:
+        err_code = SUCCESS;
+#ifdef DEBUG_LEVEL_xx2
+        ESP_LOGI(TAG, "RIGHT");
+#endif
+        break;
+        
+        default:
+        err_code = FAILURE;
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "FAILURE");
+#endif
+        break;
+           
+    }
+    return err_code;
+
+}
+
+static void manual_motor_stop(void)
+{
+    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 0);
+    motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 0);
+}
+
+static void auto_motor_stop()
+{
+    if((sens_1 == 1) && (sens_2 == 1))
+    {
+        manual_motor_stop();
+    }
+    else if((sens_2 == 1) && (sens_3 == 1))
+    {
+        manual_motor_stop();
+    }
+    else if((sens_3 == 1) && (sens_4 == 1))
+    {
+        manual_motor_stop();
+    }
+    else if((sens_4 == 1) && (sens_5 == 1))
+    {
+        manual_motor_stop();
+    }
+    else
+    {
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "Auto STOP Failed");
+#endif
+    }
+
+}
 static void motor_control_1(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle)
 {
     mcpwm_set_signal_low(mcpwm_num, timer_num, MCPWM_OPR_A);
@@ -460,10 +589,14 @@ esp_err_t get_req_handler(httpd_req_t *req)
 /*Actual function handlers to control m1, m2, m3, m4, stop commands*/ 
 esp_err_t m1_on_handler(httpd_req_t *req)
 {
+#ifdef DEBUG_LEVEL_xx1
     ESP_LOGI(TAG, "M1-ON");
+#endif
     if(Machine_type(MACHINE_1)!=SUCCESS)
     {
+#ifdef DEBUG_LEVEL_xx3
         ESP_LOGI(TAG, "M1 Failed to ON");
+#endif
     }
    
     
@@ -472,10 +605,14 @@ esp_err_t m1_on_handler(httpd_req_t *req)
 
 esp_err_t m2_on_handler(httpd_req_t *req)
 {
+#ifdef DEBUG_LEVEL_xx1
     ESP_LOGI(TAG, "M2-ON");
+#endif
     if(Machine_type(MACHINE_2)!=SUCCESS)
     {
+#ifdef DEBUG_LEVEL_xx3
         ESP_LOGI(TAG, "M2 Failed to ON");
+#endif
     }
    
     
@@ -484,10 +621,14 @@ esp_err_t m2_on_handler(httpd_req_t *req)
 
 esp_err_t m3_on_handler(httpd_req_t *req)
 {
+#ifdef DEBUG_LEVEL_xx1
     ESP_LOGI(TAG, "M3-ON");
+#endif
     if(Machine_type(MACHINE_3)!=SUCCESS)
     {
+#ifdef DEBUG_LEVEL_xx3
         ESP_LOGI(TAG, "M3 Failed to ON");
+#endif
     }
    
     
@@ -496,10 +637,14 @@ esp_err_t m3_on_handler(httpd_req_t *req)
 
 esp_err_t m4_on_handler(httpd_req_t *req)
 {
+#ifdef DEBUG_LEVEL_xx1
     ESP_LOGI(TAG, "M4-ON");
+#endif
     if(Machine_type(MACHINE_4)!=SUCCESS)
     {
+#ifdef DEBUG_LEVEL_xx3
         ESP_LOGI(TAG, "M4 Failed to ON");
+#endif
     }
      
     return m4_send_web_page(req);
@@ -507,10 +652,14 @@ esp_err_t m4_on_handler(httpd_req_t *req)
 
 esp_err_t stop_handler(httpd_req_t *req)
 {
+#ifdef DEBUG_LEVEL_xx1
     ESP_LOGI(TAG, "STOP");
+#endif
     if(Motor_cmd(STOP)!=SUCCESS)
     {
+#ifdef DEBUG_LEVEL_xx3
         ESP_LOGI(TAG, "STOP command failed");
+#endif
     }
     
     return stop_send_web_page(req);
@@ -599,7 +748,9 @@ void IR_sensor_init()
     gpio_set_direction(ARIES_IR_SENSOR_PIN_4, GPIO_MODE_INPUT);
     esp_rom_gpio_pad_select_gpio(ARIES_IR_SENSOR_PIN_5);
     gpio_set_direction(ARIES_IR_SENSOR_PIN_5, GPIO_MODE_INPUT);
+#ifdef DEBUG_LEVEL_xx3
     ESP_LOGI(TAG, "All sensor pins init success\n");
+#endif
 }
 
 void Machine_processing_task(void *pvParameter)
@@ -611,9 +762,7 @@ void Machine_processing_task(void *pvParameter)
             /*Processing Target-> Machine-1*/
             Ir_Sens_selection(IR_SENSOR_1);
             Ir_Sens_selection(IR_SENSOR_2);
-            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 90);
-
+           
         }
         else if(gf_2 == 1)
         {
@@ -633,10 +782,17 @@ void Machine_processing_task(void *pvParameter)
             Ir_Sens_selection(IR_SENSOR_4);
             Ir_Sens_selection(IR_SENSOR_5);
         }
+        else if(gf_5 == 1)
+        {
+            manual_motor_stop();
+        }
         else
         {
+#ifdef DEBUG_LEVEL_xx1
             ESP_LOGI(TAG, "No Sensor selected!!!");
+#endif
         }
+        Motor_state(MOTOR_OFF);
         vTaskDelay(10 / portTICK_PERIOD_MS);
     }
     vTaskDelete(NULL);
@@ -653,7 +809,9 @@ void app_proj_details()
 
 static void mcpwm_gpio_initialize(void)
 {
+#ifdef DEBUG_LEVEL_xx3
     printf("Aries initializing mcpwm gpio...\n");
+#endif
     mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, ARIES_PWM_MOTOR_M1_PIN);
     mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, ARIES_PWM_MOTOR_M2_PIN);
 }
@@ -665,9 +823,11 @@ void mcpwm_control(void)
     mcpwm_gpio_initialize();
 
     //2. initial mcpwm configuration
+#ifdef DEBUG_LEVEL_xx3
     printf("Configuring Initial Parameters of mcpwm...\n");
+#endif
     mcpwm_config_t pwm_config;
-    pwm_config.frequency =16000;    //frequency = 1kHz,
+    pwm_config.frequency =18000;   //frequency = 18kHz as per the Driver,
     pwm_config.cmpr_a = 0;    //duty cycle of PWMxA = 0
     pwm_config.cmpr_b = 0;    //duty cycle of PWMxb = 0
     pwm_config.counter_mode = MCPWM_UP_COUNTER;
@@ -686,16 +846,23 @@ void app_main(void)
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+#ifdef  PROJ_DET
     app_proj_details();
+#endif
+
+#ifdef DEBUG_LEVEL_xx3
     ESP_LOGI(TAG, "WIFI_MODE_AP");
+#endif
     wifi_init_softap();
 
 #ifdef LED_TEST
- Led_test_init();
+    Led_test_init();
 #endif
 
     IR_sensor_init();
+#ifdef DEBUG_LEVEL_xx3
     ESP_LOGI(TAG, "LF Web Server is running ... ...\n");
+#endif
     setup_server();
     mcpwm_control();
     xTaskCreate(&Machine_processing_task, "task_run", 1024 * 5, NULL, 3 , NULL); 
