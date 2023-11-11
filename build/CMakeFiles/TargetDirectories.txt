@@ -9,7 +9,7 @@ C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/bu
 C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/flash.dir
 C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/encrypted-flash.dir
 C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/_project_elf_src.dir
-C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/main.elf.dir
+C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/Aries_LF.elf.dir
 C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/size.dir
 C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/size-files.dir
 C:/Espressif/frameworks/esp-idf-v5.0.1/examples/Saiteja's/Line_Follower_Aries/build/CMakeFiles/size-components.dir

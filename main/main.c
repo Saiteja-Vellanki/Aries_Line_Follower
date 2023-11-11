@@ -1,11 +1,14 @@
-/*  Author: Saiteja.
+/*  Author: Saiteja Vellanki.
     Project: Industrial_Line_Follower->Proto
     Programming Lang: Embedded C
     Controller: ESP32 
     Wireless: WiFi Access point
     control: Local Web server
     client: Aries solutions pvt ltd
+    A Finite State Machine (FSM) Approach
     code access: https://github.com/saitez/Aries_Line_Follower
+    Binary Path: Aries_Line_Follower/build/Aries_LF.bin
+    ELF Path: Aries_Line_Follower/build/Aries_LF.elf
     Date:31-10-2023
 */
 #include <stdio.h>
@@ -29,7 +32,8 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 #include "driver/gpio.h"
-
+#include "esp_app_desc.h"
+#include <inttypes.h> 
 
 
 /*Macro define's wifi SSID*/ 
@@ -68,7 +72,15 @@ static const char *TAG = "Aries_Line_Follower";
 #define IR_STATE_LOW  0
 
 /*Global variables*/
+
+/*Sensor output global variable*/
 uint8_t sens_1,sens_2,sens_3,sens_4,sens_5;
+
+/*Machine selection global flag*/
+uint8_t gf_1,gf_2,gf_3,gf_4,gf_5;
+
+/*Complete project details*/
+const esp_app_desc_t *app_desc = NULL;
 
 /*User-defined enum control Error states*/
 typedef enum Error_States
@@ -227,12 +239,11 @@ void wifi_init_softap(void)
 error_st Ir_Sens_selection(ir_sens selection)
 {
     uint8_t ir_sens=selection;
-    uint8_t err_code/*,curr_state,prev_state*/;
+    uint8_t err_code;
     switch (ir_sens)
     {
         case IR_SENSOR_1:
         sens_1 = gpio_get_level(ARIES_IR_SENSOR_PIN_1);
-        // curr_state = sens_1;
         ESP_LOGI(TAG, "IR_SENSOR_1 :%d",sens_1);
         err_code = SUCCESS;
         break;
@@ -278,27 +289,49 @@ error_st Machine_type(mach_typ type)
     switch (mach_typ)
     {
         case MACHINE_1:
-        err_code = Ir_Sens_selection(IR_SENSOR_1);
-        err_code = Ir_Sens_selection(IR_SENSOR_5);
+        Motor_cmd(START);
         ESP_LOGI(TAG, "M1-ON SWITCH CASE");
+        gf_1 = 1;
+        Motor_state(MOTOR_ON);
+        gf_2 = 0;
+        gf_3 = 0;
+        gf_4 = 0;
+        err_code = SUCCESS;
         break;
         case MACHINE_2:
-        err_code = Ir_Sens_selection(IR_SENSOR_2);
-        err_code = Ir_Sens_selection(IR_SENSOR_5);
+        Motor_cmd(START);
         ESP_LOGI(TAG, "M2-ON SWITCH CASE");
+        gf_1 = 0;
+        gf_2 = 1;
+        Motor_state(MOTOR_ON);
+        gf_3 = 0;
+        gf_4 = 0;
+        err_code = SUCCESS;
         break;
         case MACHINE_3:
-        err_code = Ir_Sens_selection(IR_SENSOR_3);
-        err_code = Ir_Sens_selection(IR_SENSOR_5);
+        Motor_cmd(START);
         ESP_LOGI(TAG, "M3-ON SWITCH CASE");
+        gf_1 = 0;
+        gf_2 = 0;
+        gf_3 = 1;
+        Motor_state(MOTOR_ON);
+        gf_4 = 0;
+        err_code = SUCCESS;
         break;
         case MACHINE_4:
-        err_code = Ir_Sens_selection(IR_SENSOR_4);
-        err_code = Ir_Sens_selection(IR_SENSOR_5);
+        Motor_cmd(START);
         ESP_LOGI(TAG, "M4-ON SWITCH CASE");
+        gf_1 = 0;
+        gf_2 = 0;
+        gf_3 = 0;
+        gf_4 = 1;
+        Motor_state(MOTOR_ON);
+        err_code = SUCCESS;
         break;
         
         default:
+        Motor_cmd(STOP);
+        Motor_state(MOTOR_OFF);
         err_code = FAILURE;
         ESP_LOGI(TAG, "OFF SWITCH CASE");
         break;
@@ -324,6 +357,34 @@ error_st Motor_cmd(motor_cmd cmd)
         case START:
         err_code = SUCCESS;
         ESP_LOGI(TAG, "START");
+        break;
+        
+        default:
+        err_code = FAILURE;
+        ESP_LOGI(TAG, "OFF SWITCH CASE");
+        break;
+           
+    }
+    return err_code;
+   
+}
+
+/*Brief function handles Motor_state*/
+/*function argumentsMOTOR_OFF/MOTOR_ON*/
+/*error_st Motor_state(motor_states states) returns SUCCESS/FAILURE */
+error_st Motor_state(motor_states states)
+{
+    uint8_t motor_state=states;
+    uint8_t err_code;
+    switch (motor_state)
+    {
+        case MOTOR_OFF:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "MOTOR OFF");
+        break;
+        case MOTOR_ON:
+        err_code = SUCCESS;
+        ESP_LOGI(TAG, "MOTOR ON");
         break;
         
         default:
@@ -523,6 +584,51 @@ void IR_sensor_init()
     ESP_LOGI(TAG, "All sensor pins init success\n");
 }
 
+void Machine_processing_task(void *pvParameter)
+{
+    for(;;)
+    {
+        if(gf_1 == 1)
+        {
+            /*Processing Target-> Machine-1*/
+            Ir_Sens_selection(IR_SENSOR_1);
+            Ir_Sens_selection(IR_SENSOR_2);
+        }
+        else if(gf_2 == 1)
+        {
+            /*Processing Target-> Machine-2*/
+            Ir_Sens_selection(IR_SENSOR_2);
+            Ir_Sens_selection(IR_SENSOR_3);
+        }
+        else if(gf_3 == 1)
+        {
+            /*Processing Target-> Machine-3*/
+            Ir_Sens_selection(IR_SENSOR_3);
+            Ir_Sens_selection(IR_SENSOR_4);
+        }
+        else if(gf_4 == 1)
+        {
+            /*Processing Target-> Machine-4*/
+            Ir_Sens_selection(IR_SENSOR_4);
+            Ir_Sens_selection(IR_SENSOR_5);
+        }
+        else
+        {
+            ESP_LOGI(TAG, "No Sensor selected!!!");
+        }
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+    vTaskDelete(NULL);
+}
+
+void app_proj_details()
+{
+    app_desc = esp_app_get_description();
+    ESP_EARLY_LOGI(TAG, "Project name:     %s", app_desc->project_name);
+    ESP_EARLY_LOGI(TAG, "App version:      %s", app_desc->version);
+    ESP_EARLY_LOGI(TAG, "Secure version:   %d", app_desc->secure_version);
+    ESP_EARLY_LOGI(TAG, "Compile time:     %s %s", app_desc->date, app_desc->time);
+}
 void app_main(void)
 {
     //Initialize NVS
@@ -532,7 +638,7 @@ void app_main(void)
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
-
+    app_proj_details();
     ESP_LOGI(TAG, "WIFI_MODE_AP");
     wifi_init_softap();
 
@@ -543,4 +649,5 @@ void app_main(void)
     IR_sensor_init();
     ESP_LOGI(TAG, "LF Web Server is running ... ...\n");
     setup_server();
+    xTaskCreate(&Machine_processing_task, "task_run", 1024 * 5, NULL, 3 , NULL); 
 }
