@@ -75,6 +75,11 @@ static const char *TAG = "Aries_Line_Follower";
 #define IR_STATE_HIGH 1
 #define IR_STATE_LOW  0
 
+/*Macro's define for Button states*/ 
+#define BUTTON_STATE_HIGH 1
+#define BUTTON_STATE_LOW  0
+
+
 /*User-defined enum control Error states*/
 typedef enum Error_States
 {
@@ -124,8 +129,35 @@ typedef enum IR_Sensor
    IR_SENSOR_4,
    IR_SENSOR_5
 }ir_sens;
-/*Global variables*/
 
+
+// /*User-defined structure to hold sensor global data*/
+// typedef struct Sensor_data
+// {
+//     uint8_t sens_1:1;
+//     uint8_t sens_2:1;
+//     uint8_t sens_3:1;
+//     uint8_t sens_4:1;
+//     uint8_t sens_5:1;
+//     uint8_t reserved:3;
+
+// }s_data;
+
+// /*User-defined structure to hold global flags*/
+// typedef struct Global_flag
+// {
+//     uint8_t gf_1:1;
+//     uint8_t gf_2:1;
+//     uint8_t gf_3:1;
+//     uint8_t gf_4:1;
+//     uint8_t gf_5:1;
+//     uint8_t reserved:3;
+
+// }g_flag;
+
+/*Global variables*/
+//g_flag *global_flag;
+//s_data *sensor_data;
 /*Sensor output global variable*/
 uint8_t sens_1,sens_2,sens_3,sens_4,sens_5;
 
@@ -150,12 +182,12 @@ static void auto_motor_stop(void);
 
 
 /*char array's  define's HTML code to ON/OFF channels M1, M2, M3, M4 and STOP*/ 
-char M1_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M1</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
-char M2_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M2</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
-char M3_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M3</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
-char M4_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M4</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
+char M1_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #364cf4; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.button3 {  background-color: #364cf4; //blue color}.button4 {  background-color: #364cf4; //blue color}.button5 {  background-color: #ff0000; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M1</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
+char M2_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #364cf4; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.button3 {  background-color: #364cf4; //blue color}.button4 {  background-color: #364cf4; //blue color}.button5 {  background-color: #ff0000; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M2</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
+char M3_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #364cf4; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.button3 {  background-color: #364cf4; //blue color}.button4 {  background-color: #364cf4; //blue color}.button5 {  background-color: #ff0000; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M3</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
+char M4_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #364cf4; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.button3 {  background-color: #364cf4; //blue color}.button4 {  background-color: #364cf4; //blue color}.button5 {  background-color: #ff0000; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> M4</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
 
-char stop_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #b30000; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> STOP</strong></p>        <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
+char stop_resp[] = "<!DOCTYPE html> <title> Aries </title><html> <head><fieldset ><center> <img src=\"Aries.png\"></head> <body> <meta name=\"viewport\"content=\"width=device-width, initial-scale=1\"><link rel=\"icon<style\"href=\"data:,\"> <style>body {text-align: center;font-family: \"Trebuchet MS\", Arial;margin-left:auto;margin-right:auto; }.slider {width: 300px; }</style><style type=\"text/css\">html{  font-family: Arial;  display: inline-block;  margin: 0px auto;  text-align: center;}h1{  color: #070812;  padding: 2vh;}.button {  display: inline-block;  background-color: #364cf4; //red color  border: none;  border-radius: 4px;  color: white;  padding: 16px 40px;  text-decoration: none;  font-size: 30px;  margin: 2px;  cursor: pointer;}.button2 {  background-color: #364cf4; //blue color}.button3 {  background-color: #364cf4; //blue color}.button4 {  background-color: #364cf4; //blue color}.button5 {  background-color: #ff0000; //blue color}.content {   padding: 50px;}.card-grid {  max-width: 800px;  margin: 0 auto;  display: grid;  grid-gap: 2rem;  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));}.card {  background-color: white;  box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);}.card-title {  font-size: 1.2rem;  font-weight: bold;  color: #034078}</style>  <title>Line Follower</title>  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <link rel=\"icon\" href=\"data:,\">  <link rel=\"stylesheet\" href=\"https://use.fontawesome.com/releases/v5.7.2/css/all.css\"    integrity=\"sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr\" crossorigin=\"anonymous\">  <link rel=\"stylesheet\" type=\"text/css\"></head><body>  <h2>Line Follower</h2>  <div class=\"content\">    <div class=\"card-grid\">      <div class=\"card\">        <p><i class=\"fas fa-lightbulb fa-2x\" style=\"color:#c81919;\"></i> <p>Current state: <strong> STOP</strong></p>    <p>          <a href=\"/M1on\"><button class=\"button\">M1</button></a>          <a href=\"/M2on\"><button class=\"button button2\">M2</button></a> <a href=\"/M3on\"><button class=\"button button3\">M3</button></a> <a href=\"/M4on\"><button class=\"button button4\">M4</button></a> <a href=\"/STP\"><button class=\"button button5\">STOP</button></a>      </p>      </div>    </div>  </div></body></html>";
 
 /*char array's  define's extracting Company logo from build binary*/ 
 extern const uint8_t logo_start[] asm("_binary_Aries_png_start");
@@ -318,12 +350,12 @@ error_st Machine_type(mach_typ type)
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M1-ON SWITCH CASE");
 #endif
-        gf_1 = 1;
+        gf_1 = BUTTON_STATE_HIGH;
         Motor_state(MOTOR_ON);
-        gf_2 = 0;
-        gf_3 = 0;
-        gf_4 = 0;
-        gf_5 = 0;
+        gf_2 = BUTTON_STATE_LOW;
+        gf_3 = BUTTON_STATE_LOW;
+        gf_4 = BUTTON_STATE_LOW;
+        gf_5 = BUTTON_STATE_LOW;
         err_code = SUCCESS;
         break;
         case MACHINE_2:
@@ -331,12 +363,12 @@ error_st Machine_type(mach_typ type)
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M2-ON SWITCH CASE");
 #endif
-        gf_1 = 0;
-        gf_2 = 1;
+        gf_1 = BUTTON_STATE_LOW;
+        gf_2 = BUTTON_STATE_HIGH;
         Motor_state(MOTOR_ON);
-        gf_3 = 0;
-        gf_4 = 0;
-        gf_5 = 0;
+        gf_3 = BUTTON_STATE_LOW;
+        gf_4 = BUTTON_STATE_LOW;
+        gf_5 = BUTTON_STATE_LOW;
         err_code = SUCCESS;
         break;
         case MACHINE_3:
@@ -344,12 +376,12 @@ error_st Machine_type(mach_typ type)
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M3-ON SWITCH CASE");
 #endif
-        gf_1 = 0;
-        gf_2 = 0;
-        gf_3 = 1;
+        gf_1 = BUTTON_STATE_LOW;
+        gf_2 = BUTTON_STATE_LOW;
+        gf_3 = BUTTON_STATE_HIGH;
         Motor_state(MOTOR_ON);
-        gf_4 = 0;
-        gf_5 = 0;
+        gf_4 = BUTTON_STATE_LOW;
+        gf_5 = BUTTON_STATE_LOW;
         err_code = SUCCESS;
         break;
         case MACHINE_4:
@@ -357,11 +389,11 @@ error_st Machine_type(mach_typ type)
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "M4-ON SWITCH CASE");
 #endif
-        gf_1 = 0;
-        gf_2 = 0;
-        gf_3 = 0;
-        gf_4 = 1;
-        gf_5 = 0;
+        gf_1 = BUTTON_STATE_LOW;
+        gf_2 = BUTTON_STATE_LOW;
+        gf_3 = BUTTON_STATE_LOW;
+        gf_4 = BUTTON_STATE_HIGH;
+        gf_5 = BUTTON_STATE_LOW;
         Motor_state(MOTOR_ON);
         err_code = SUCCESS;
         break;
@@ -393,7 +425,7 @@ error_st Motor_cmd(motor_cmd cmd)
         gf_2 = 0;
         gf_3 = 0;
         gf_4 = 0;
-        gf_5 = 1;
+        gf_5 = BUTTON_STATE_HIGH;
         err_code = SUCCESS;
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "MOTOR STOP");
@@ -506,19 +538,19 @@ static void manual_motor_stop(void)
 
 static void auto_motor_stop()
 {
-    if((sens_1 == 1) && (sens_2 == 1))
+    if((sens_1 == IR_STATE_HIGH) && (sens_2 == IR_STATE_HIGH))
     {
         manual_motor_stop();
     }
-    else if((sens_2 == 1) && (sens_3 == 1))
+    else if((sens_2 == IR_STATE_HIGH) && (sens_3 == IR_STATE_HIGH))
     {
         manual_motor_stop();
     }
-    else if((sens_3 == 1) && (sens_4 == 1))
+    else if((sens_3 == IR_STATE_HIGH) && (sens_4 == IR_STATE_HIGH))
     {
         manual_motor_stop();
     }
-    else if((sens_4 == 1) && (sens_5 == 1))
+    else if((sens_4 == IR_STATE_HIGH) && (sens_5 == IR_STATE_HIGH))
     {
         manual_motor_stop();
     }
@@ -757,32 +789,32 @@ void Machine_processing_task(void *pvParameter)
 {
     for(;;)
     {
-        if(gf_1 == 1)
+        if(gf_1 == BUTTON_STATE_HIGH)
         {
             /*Processing Target-> Machine-1*/
             Ir_Sens_selection(IR_SENSOR_1);
             Ir_Sens_selection(IR_SENSOR_2);
            
         }
-        else if(gf_2 == 1)
+        else if(gf_2 == BUTTON_STATE_HIGH)
         {
             /*Processing Target-> Machine-2*/
             Ir_Sens_selection(IR_SENSOR_2);
             Ir_Sens_selection(IR_SENSOR_3);
         }
-        else if(gf_3 == 1)
+        else if(gf_3 == BUTTON_STATE_HIGH)
         {
             /*Processing Target-> Machine-3*/
             Ir_Sens_selection(IR_SENSOR_3);
             Ir_Sens_selection(IR_SENSOR_4);
         }
-        else if(gf_4 == 1)
+        else if(gf_4 == BUTTON_STATE_HIGH)
         {
             /*Processing Target-> Machine-4*/
             Ir_Sens_selection(IR_SENSOR_4);
             Ir_Sens_selection(IR_SENSOR_5);
         }
-        else if(gf_5 == 1)
+        else if(gf_5 == BUTTON_STATE_HIGH)
         {
             manual_motor_stop();
         }
