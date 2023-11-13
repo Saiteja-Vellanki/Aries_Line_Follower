@@ -65,6 +65,7 @@ static const char *TAG = "Aries_Line_Follower";
 #define DEBUG_LEVEL_xx1 1
 #define DEBUG_LEVEL_xx2 1
 #define DEBUG_LEVEL_xx3 1
+//#define DELAY_IN_2SEC   1
 
 /*Macro define's for test LED*/ 
 #ifdef  LED_TEST
@@ -143,7 +144,7 @@ typedef enum IR_Sensor
 
 // }s_data;
 
-// /*User-defined structure to hold global flags*/
+/*User-defined structure to hold global flags*/
 // typedef struct Global_flag
 // {
 //     uint8_t gf_1:1;
@@ -348,7 +349,7 @@ error_st Machine_type(mach_typ type)
         case MACHINE_1:
         Motor_cmd(START);
 #ifdef DEBUG_LEVEL_xx2
-        ESP_LOGI(TAG, "M1-ON SWITCH CASE");
+        ESP_LOGI(TAG, "M1-ON");
 #endif
         gf_1 = BUTTON_STATE_HIGH;
         Motor_state(MOTOR_ON);
@@ -361,7 +362,7 @@ error_st Machine_type(mach_typ type)
         case MACHINE_2:
         Motor_cmd(START);
 #ifdef DEBUG_LEVEL_xx2
-        ESP_LOGI(TAG, "M2-ON SWITCH CASE");
+        ESP_LOGI(TAG, "M2-ON");
 #endif
         gf_1 = BUTTON_STATE_LOW;
         gf_2 = BUTTON_STATE_HIGH;
@@ -374,7 +375,7 @@ error_st Machine_type(mach_typ type)
         case MACHINE_3:
         Motor_cmd(START);
 #ifdef DEBUG_LEVEL_xx2
-        ESP_LOGI(TAG, "M3-ON SWITCH CASE");
+        ESP_LOGI(TAG, "M3-ON");
 #endif
         gf_1 = BUTTON_STATE_LOW;
         gf_2 = BUTTON_STATE_LOW;
@@ -387,7 +388,7 @@ error_st Machine_type(mach_typ type)
         case MACHINE_4:
         Motor_cmd(START);
 #ifdef DEBUG_LEVEL_xx2
-        ESP_LOGI(TAG, "M4-ON SWITCH CASE");
+        ESP_LOGI(TAG, "M4-ON");
 #endif
         gf_1 = BUTTON_STATE_LOW;
         gf_2 = BUTTON_STATE_LOW;
@@ -821,11 +822,17 @@ void Machine_processing_task(void *pvParameter)
         else
         {
 #ifdef DEBUG_LEVEL_xx1
-            ESP_LOGI(TAG, "No Sensor selected!!!");
+        ESP_LOGI(TAG, "No Sensor selected!!!");
 #endif
         }
         Motor_state(MOTOR_OFF);
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+#ifdef DELAY_IN_2SEC
+        vTaskDelay(2000 / portTICK_PERIOD_MS);   
+#else 
+        vTaskDelay(10 / portTICK_PERIOD_MS);       
+#endif
+
+        
     }
     vTaskDelete(NULL);
 }
