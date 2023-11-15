@@ -52,6 +52,12 @@ static const char *TAG = "Aries_Line_Follower";
 #define ARIES_PWM_MOTOR_M1_PIN  25
 #define ARIES_PWM_MOTOR_M2_PIN  26
 
+
+/*Macro's define's Digital pins to control Direction of the motors*/ 
+#define ARIES_DIR_MOTOR_M1_PIN  2
+#define ARIES_DIR_MOTOR_M2_PIN  3
+
+
 /*Macro's define's I/O Digital pins for IR sensors*/ 
 #define ARIES_IR_SENSOR_PIN_1  18
 #define ARIES_IR_SENSOR_PIN_2  19
@@ -66,10 +72,12 @@ static const char *TAG = "Aries_Line_Follower";
 #define DEBUG_LEVEL_xx2 1
 #define DEBUG_LEVEL_xx3 1
 //#define DELAY_IN_2SEC   1
+//#define MOTOR_TEST 1              /*30 sec one direction and 30 sec another direction motor test*/
+
 
 /*Macro define's for test LED*/ 
 #ifdef  LED_TEST
-#define LED_PIN 2
+#define LED_PIN 12
 #endif
 
 /*Macro's define for test IR states*/ 
@@ -79,6 +87,12 @@ static const char *TAG = "Aries_Line_Follower";
 /*Macro's define for Button states*/ 
 #define BUTTON_STATE_HIGH 1
 #define BUTTON_STATE_LOW  0
+
+/*Macro's define for Motor Dir*/ 
+#define MOTOR_DIR_HIGH 1
+#define MOTOR_DIR_LOW  0
+
+
 
 
 /*User-defined enum control Error states*/
@@ -180,6 +194,17 @@ static void motor_control_1(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , fl
 static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , float duty_cycle);
 static void manual_motor_stop(void);
 static void auto_motor_stop(void);
+static void motor_test(void);
+
+/*Function proto-types TBD*/
+void Machine_processing_task(void *pvParameter);
+void mcpwm_control(void);
+static void mcpwm_gpio_initialize(void);
+void app_proj_details();
+void Motor_dir_gpio_init();
+void IR_sensor_init();
+void Led_test_init();
+
 
 
 /*char array's  define's HTML code to ON/OFF channels M1, M2, M3, M4 and STOP*/ 
@@ -786,6 +811,20 @@ void IR_sensor_init()
 #endif
 }
 
+/*Brief function handles test Motor direction gpio init*/
+/*function arguments NONE */
+/*void Motor_dir_gpio_init() returns NONE */
+void Motor_dir_gpio_init()
+{
+    esp_rom_gpio_pad_select_gpio(ARIES_DIR_MOTOR_M1_PIN);
+    gpio_set_direction(ARIES_DIR_MOTOR_M1_PIN, GPIO_MODE_OUTPUT);
+    esp_rom_gpio_pad_select_gpio(ARIES_DIR_MOTOR_M2_PIN);
+    gpio_set_direction(ARIES_DIR_MOTOR_M2_PIN, GPIO_MODE_OUTPUT);
+#ifdef DEBUG_LEVEL_xx3
+    ESP_LOGI(TAG, "Motor direction pins init success\n");
+#endif
+}
+
 void Machine_processing_task(void *pvParameter)
 {
     for(;;)
@@ -866,7 +905,7 @@ void mcpwm_control(void)
     printf("Configuring Initial Parameters of mcpwm...\n");
 #endif
     mcpwm_config_t pwm_config;
-    pwm_config.frequency =18000;   //frequency = 18kHz as per the Driver,
+    pwm_config.frequency =18000;   //frequency = 18kHz as per the MDDS30 Driver,
     pwm_config.cmpr_a = 0;    //duty cycle of PWMxA = 0
     pwm_config.cmpr_b = 0;    //duty cycle of PWMxb = 0
     pwm_config.counter_mode = MCPWM_UP_COUNTER;
@@ -874,6 +913,22 @@ void mcpwm_control(void)
     mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);    
     mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_config);    
     
+}
+
+static void motor_test(void)
+{
+    gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+    gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 100);
+    motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 100);
+    vTaskDelay(30000 / portTICK_PERIOD_MS); 
+
+    gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
+    gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
+    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 100);
+    motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 100);
+    vTaskDelay(30000 / portTICK_PERIOD_MS); 
+
 }
 
 void app_main(void)
@@ -899,10 +954,18 @@ void app_main(void)
 #endif
 
     IR_sensor_init();
+    Motor_dir_gpio_init();
+    setup_server();
 #ifdef DEBUG_LEVEL_xx3
     ESP_LOGI(TAG, "LF Web Server is running ... ...\n");
 #endif
-    setup_server();
     mcpwm_control();
+#ifdef MOTOR_TEST
+    while(1)
+    {
+        motor_test();
+    }
+#else
     xTaskCreate(&Machine_processing_task, "task_run", 1024 * 5, NULL, 3 , NULL); 
+#endif
 }
