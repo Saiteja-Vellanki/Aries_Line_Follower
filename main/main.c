@@ -195,15 +195,20 @@ static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , fl
 static void manual_motor_stop(void);
 static void auto_motor_stop(void);
 static void motor_test(void);
+static void motor_forward(mach_typ type);
+static void motor_backward(mach_typ type);
+static void motor_left(mach_typ type);
+static void motor_right(mach_typ type);
+
 
 /*Function proto-types TBD*/
-void Machine_processing_task(void *pvParameter);
-void mcpwm_control(void);
+static void Machine_processing_task(void *pvParameter);
+static void mcpwm_control(void);
 static void mcpwm_gpio_initialize(void);
-void app_proj_details();
-void Motor_dir_gpio_init();
-void IR_sensor_init();
-void Led_test_init();
+static void app_proj_details();
+static void Motor_dir_gpio_init();
+static void IR_sensor_init();
+static void Led_test_init();
 
 
 
@@ -517,9 +522,11 @@ error_st Motor_Dir_update(mach_typ type, motor_dir direction)
     uint8_t motor_dir=direction;
     uint8_t err_code;
 
-    switch (direction)
+    switch (motor_dir)
     {
         case FORWARD:
+        motor_forward(motor_type);
+
         err_code = SUCCESS;
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "FORWARD");
@@ -527,17 +534,20 @@ error_st Motor_Dir_update(mach_typ type, motor_dir direction)
         break;
         case BACKWARD:
         err_code = SUCCESS;
+        motor_backward(motor_type);
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "BACKWARD");
 #endif
         break;
         case LEFT:
+        motor_left(motor_type);
         err_code = SUCCESS;
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "LEFT");
 #endif
         break;
         case RIGHT:
+        motor_right(motor_type);
         err_code = SUCCESS;
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "RIGHT");
@@ -601,7 +611,116 @@ static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , fl
     mcpwm_set_duty(mcpwm_num, timer_num, MCPWM_OPR_B, duty_cycle);
     mcpwm_set_duty_type(mcpwm_num, timer_num, MCPWM_OPR_B, MCPWM_DUTY_MODE_0);
 }
-    
+
+static void motor_forward(mach_typ type)
+{
+    ;
+}
+static void motor_backward(mach_typ type)
+{
+    ;
+}
+static void motor_left(mach_typ type)
+{
+    if(type == MACHINE_1)
+    {
+        if((sens_1 == IR_STATE_HIGH) || (sens_2 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+        }
+    }
+    else if(type == MACHINE_2)
+    {
+        if((sens_2 == IR_STATE_HIGH) || (sens_3 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+        }
+
+    }
+    else if(type == MACHINE_3)
+    {
+        if((sens_3 == IR_STATE_HIGH) || (sens_4 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+        }
+
+    }
+    else if(type == MACHINE_4)
+    {
+        if((sens_4 == IR_STATE_HIGH) || (sens_5 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+        }
+
+    }
+    else
+    {
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "left Direction Failed");
+#endif
+    }
+}
+static void motor_right(mach_typ type)
+{
+    if(type == MACHINE_1)
+    {
+        if((sens_2 == IR_STATE_HIGH) || (sens_1 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+    }
+    else if(type == MACHINE_2)
+    {
+        if((sens_3 == IR_STATE_HIGH) || (sens_2 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+    }
+    else if(type == MACHINE_3)
+    {
+        if((sens_4 == IR_STATE_HIGH) || (sens_3 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+    }
+    else if(type == MACHINE_4)
+    {
+        if((sens_5 == IR_STATE_HIGH) || (sens_4 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+    }
+    else
+    {
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "right Direction Failed");
+#endif
+    }
+}
 
 esp_err_t m1_send_web_page(httpd_req_t *req)
 {
@@ -834,25 +953,40 @@ void Machine_processing_task(void *pvParameter)
             /*Processing Target-> Machine-1*/
             Ir_Sens_selection(IR_SENSOR_1);
             Ir_Sens_selection(IR_SENSOR_2);
-           
+            Motor_Dir_update(MACHINE_1,FORWARD);
+            Motor_Dir_update(MACHINE_1,BACKWARD);
+            Motor_Dir_update(MACHINE_1,LEFT);
+            Motor_Dir_update(MACHINE_1,RIGHT);
         }
         else if(gf_2 == BUTTON_STATE_HIGH)
         {
             /*Processing Target-> Machine-2*/
             Ir_Sens_selection(IR_SENSOR_2);
             Ir_Sens_selection(IR_SENSOR_3);
+            Motor_Dir_update(MACHINE_2,FORWARD);
+            Motor_Dir_update(MACHINE_2,BACKWARD);
+            Motor_Dir_update(MACHINE_2,LEFT);
+            Motor_Dir_update(MACHINE_2,RIGHT);
         }
         else if(gf_3 == BUTTON_STATE_HIGH)
         {
             /*Processing Target-> Machine-3*/
             Ir_Sens_selection(IR_SENSOR_3);
             Ir_Sens_selection(IR_SENSOR_4);
+            Motor_Dir_update(MACHINE_3,FORWARD);
+            Motor_Dir_update(MACHINE_3,BACKWARD);
+            Motor_Dir_update(MACHINE_3,LEFT);
+            Motor_Dir_update(MACHINE_3,RIGHT);
         }
         else if(gf_4 == BUTTON_STATE_HIGH)
         {
             /*Processing Target-> Machine-4*/
             Ir_Sens_selection(IR_SENSOR_4);
             Ir_Sens_selection(IR_SENSOR_5);
+            Motor_Dir_update(MACHINE_4,FORWARD);
+            Motor_Dir_update(MACHINE_4,BACKWARD);
+            Motor_Dir_update(MACHINE_4,LEFT);
+            Motor_Dir_update(MACHINE_4,RIGHT);
         }
         else if(gf_5 == BUTTON_STATE_HIGH)
         {
