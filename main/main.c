@@ -526,12 +526,12 @@ error_st Motor_Dir_update(mach_typ type, motor_dir direction)
     {
         case FORWARD:
         motor_forward(motor_type);
-
         err_code = SUCCESS;
 #ifdef DEBUG_LEVEL_xx2
         ESP_LOGI(TAG, "FORWARD");
 #endif
         break;
+
         case BACKWARD:
         err_code = SUCCESS;
         motor_backward(motor_type);
@@ -539,6 +539,7 @@ error_st Motor_Dir_update(mach_typ type, motor_dir direction)
         ESP_LOGI(TAG, "BACKWARD");
 #endif
         break;
+
         case LEFT:
         motor_left(motor_type);
         err_code = SUCCESS;
@@ -546,6 +547,7 @@ error_st Motor_Dir_update(mach_typ type, motor_dir direction)
         ESP_LOGI(TAG, "LEFT");
 #endif
         break;
+
         case RIGHT:
         motor_right(motor_type);
         err_code = SUCCESS;
@@ -614,7 +616,58 @@ static void motor_control_2(mcpwm_unit_t mcpwm_num, mcpwm_timer_t timer_num , fl
 
 static void motor_forward(mach_typ type)
 {
-    ;
+    
+    uint8_t m_type = type;
+
+    if(m_type == MACHINE_1)
+    {
+        if((sens_1 == IR_STATE_LOW) && (sens_2 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+    }
+    else if(m_type == MACHINE_2)
+    {
+        if((sens_2 == IR_STATE_LOW) && (sens_3 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+
+    }
+    else if(m_type == MACHINE_3)
+    {
+        if((sens_3 == IR_STATE_LOW) && (sens_4 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+
+    }
+    else if(m_type == MACHINE_4)
+    {
+        if((sens_4 == IR_STATE_LOW) && (sens_5 == IR_STATE_LOW))
+        {
+            gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
+            gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
+            motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
+            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+        }
+
+    }
+    else
+    {
+#ifdef DEBUG_LEVEL_xx3
+        ESP_LOGI(TAG, "forward Direction Failed");
+#endif
+    }
 }
 static void motor_backward(mach_typ type)
 {
@@ -622,9 +675,11 @@ static void motor_backward(mach_typ type)
 }
 static void motor_left(mach_typ type)
 {
-    if(type == MACHINE_1)
+    uint8_t m_type = type;
+
+    if(m_type == MACHINE_1)
     {
-        if((sens_1 == IR_STATE_HIGH) || (sens_2 == IR_STATE_LOW))
+        if((sens_1 == IR_STATE_HIGH) && (sens_2 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
@@ -632,9 +687,9 @@ static void motor_left(mach_typ type)
             motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
         }
     }
-    else if(type == MACHINE_2)
+    else if(m_type == MACHINE_2)
     {
-        if((sens_2 == IR_STATE_HIGH) || (sens_3 == IR_STATE_LOW))
+        if((sens_2 == IR_STATE_HIGH) && (sens_3 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
@@ -643,9 +698,9 @@ static void motor_left(mach_typ type)
         }
 
     }
-    else if(type == MACHINE_3)
+    else if(m_type == MACHINE_3)
     {
-        if((sens_3 == IR_STATE_HIGH) || (sens_4 == IR_STATE_LOW))
+        if((sens_3 == IR_STATE_HIGH) && (sens_4 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
@@ -654,9 +709,9 @@ static void motor_left(mach_typ type)
         }
 
     }
-    else if(type == MACHINE_4)
+    else if(m_type == MACHINE_4)
     {
-        if((sens_4 == IR_STATE_HIGH) || (sens_5 == IR_STATE_LOW))
+        if((sens_4 == IR_STATE_HIGH) && (sens_5 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
@@ -674,9 +729,11 @@ static void motor_left(mach_typ type)
 }
 static void motor_right(mach_typ type)
 {
-    if(type == MACHINE_1)
+    uint8_t m_type = type;
+
+    if(m_type == MACHINE_1)
     {
-        if((sens_2 == IR_STATE_HIGH) || (sens_1 == IR_STATE_LOW))
+        if((sens_2 == IR_STATE_HIGH) && (sens_1 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
@@ -684,9 +741,9 @@ static void motor_right(mach_typ type)
             motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
         }
     }
-    else if(type == MACHINE_2)
+    else if(m_type == MACHINE_2)
     {
-        if((sens_3 == IR_STATE_HIGH) || (sens_2 == IR_STATE_LOW))
+        if((sens_3 == IR_STATE_HIGH) && (sens_2 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
@@ -694,9 +751,9 @@ static void motor_right(mach_typ type)
             motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
         }
     }
-    else if(type == MACHINE_3)
+    else if(m_type == MACHINE_3)
     {
-        if((sens_4 == IR_STATE_HIGH) || (sens_3 == IR_STATE_LOW))
+        if((sens_4 == IR_STATE_HIGH) && (sens_3 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
@@ -704,9 +761,9 @@ static void motor_right(mach_typ type)
             motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
         }
     }
-    else if(type == MACHINE_4)
+    else if(m_type == MACHINE_4)
     {
-        if((sens_5 == IR_STATE_HIGH) || (sens_4 == IR_STATE_LOW))
+        if((sens_5 == IR_STATE_HIGH) && (sens_4 == IR_STATE_LOW))
         {
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
