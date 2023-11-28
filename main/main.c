@@ -49,6 +49,9 @@
 static const char *TAG = "Aries_Line_Follower";
 
 /*Macro's define's PWM pins to control motors*/ 
+// #define ARIES_PWM_MOTOR_M1_PIN  13
+// #define ARIES_PWM_MOTOR_M2_PIN  14
+
 #define ARIES_PWM_MOTOR_M1_PIN  25
 #define ARIES_PWM_MOTOR_M2_PIN  26
 
@@ -72,7 +75,7 @@ static const char *TAG = "Aries_Line_Follower";
 #define DEBUG_LEVEL_xx2 1
 #define DEBUG_LEVEL_xx3 1
 //#define DELAY_IN_2SEC   1
-//#define MOTOR_TEST 1              /*30 sec one direction and 30 sec another direction motor test*/
+#define MOTOR_TEST 1              /*30 sec one direction and 30 sec another direction motor test*/
 
 
 /*Macro define's for test LED*/ 
@@ -571,7 +574,7 @@ error_st Motor_Dir_update(mach_typ type, motor_dir direction)
 static void manual_motor_stop(void)
 {
     motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 0);
-    motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 0);
+    motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 0);
 }
 
 static void auto_motor_stop()
@@ -626,7 +629,7 @@ static void motor_forward(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
     }
     else if(m_type == MACHINE_2)
@@ -636,7 +639,7 @@ static void motor_forward(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
 
     }
@@ -647,7 +650,7 @@ static void motor_forward(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
 
     }
@@ -658,7 +661,7 @@ static void motor_forward(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
 
     }
@@ -684,7 +687,7 @@ static void motor_left(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
         }
     }
     else if(m_type == MACHINE_2)
@@ -694,7 +697,7 @@ static void motor_left(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
         }
 
     }
@@ -705,7 +708,7 @@ static void motor_left(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
         }
 
     }
@@ -716,7 +719,7 @@ static void motor_left(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 40);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
         }
 
     }
@@ -738,7 +741,7 @@ static void motor_right(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
     }
     else if(m_type == MACHINE_2)
@@ -748,7 +751,7 @@ static void motor_right(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
     }
     else if(m_type == MACHINE_3)
@@ -758,7 +761,7 @@ static void motor_right(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
     }
     else if(m_type == MACHINE_4)
@@ -768,7 +771,7 @@ static void motor_right(mach_typ type)
             gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
             gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
             motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
-            motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 80);
+            motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 80);
         }
     }
     else
@@ -1102,7 +1105,7 @@ void mcpwm_control(void)
     pwm_config.counter_mode = MCPWM_UP_COUNTER;
     pwm_config.duty_mode =MCPWM_DUTY_MODE_0;
     mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);    
-    mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_config);    
+    mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);    
     
 }
 
@@ -1110,14 +1113,16 @@ static void motor_test(void)
 {
     gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
     gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
-    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 100);
-    motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 100);
+    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 20);
+    motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 70);
+    ESP_EARLY_LOGI(TAG, "Dir-> 1");
     vTaskDelay(30000 / portTICK_PERIOD_MS); 
 
     gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
     gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
-    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 100);
-    motor_control_2(MCPWM_UNIT_1, MCPWM_TIMER_1, 100);
+    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 20);
+    motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 70);
+    ESP_EARLY_LOGI(TAG, "Dir-> 2");
     vTaskDelay(30000 / portTICK_PERIOD_MS); 
 
 }
