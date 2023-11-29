@@ -1113,18 +1113,21 @@ static void motor_test(void)
 {
     gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_HIGH);
     gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_HIGH);
-    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 20);
-    motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 70);
+    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
+    motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
     ESP_EARLY_LOGI(TAG, "Dir-> 1");
     vTaskDelay(30000 / portTICK_PERIOD_MS); 
+    manual_motor_stop();
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
 
     gpio_set_level(ARIES_DIR_MOTOR_M1_PIN,MOTOR_DIR_LOW);
     gpio_set_level(ARIES_DIR_MOTOR_M2_PIN,MOTOR_DIR_LOW);
-    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 20);
-    motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 70);
+    motor_control_1(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
+    motor_control_2(MCPWM_UNIT_0, MCPWM_TIMER_0, 40);
     ESP_EARLY_LOGI(TAG, "Dir-> 2");
     vTaskDelay(30000 / portTICK_PERIOD_MS); 
-
+    manual_motor_stop();
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
 }
 
 void app_main(void)
