@@ -1076,9 +1076,9 @@ void Machine_processing_task(void *pvParameter)
             Ir_Sens_selection(IR_SENSOR_1);
             Ir_Sens_selection(IR_SENSOR_2);
             Motor_Dir_update(MACHINE_1,FORWARD);
-            Motor_Dir_update(MACHINE_1,BACKWARD);
-            Motor_Dir_update(MACHINE_1,LEFT);
-            Motor_Dir_update(MACHINE_1,RIGHT);
+            //Motor_Dir_update(MACHINE_1,BACKWARD);
+            //Motor_Dir_update(MACHINE_1,LEFT);
+            //Motor_Dir_update(MACHINE_1,RIGHT);
         }
         else if(gf_2 == BUTTON_STATE_HIGH)
         {
@@ -1086,9 +1086,9 @@ void Machine_processing_task(void *pvParameter)
             Ir_Sens_selection(IR_SENSOR_2);
             Ir_Sens_selection(IR_SENSOR_3);
             Motor_Dir_update(MACHINE_2,FORWARD);
-            Motor_Dir_update(MACHINE_2,BACKWARD);
-            Motor_Dir_update(MACHINE_2,LEFT);
-            Motor_Dir_update(MACHINE_2,RIGHT);
+           //Motor_Dir_update(MACHINE_2,BACKWARD);
+            //Motor_Dir_update(MACHINE_2,LEFT);
+            //Motor_Dir_update(MACHINE_2,RIGHT);
         }
         else if(gf_3 == BUTTON_STATE_HIGH)
         {
@@ -1096,9 +1096,9 @@ void Machine_processing_task(void *pvParameter)
             Ir_Sens_selection(IR_SENSOR_3);
             Ir_Sens_selection(IR_SENSOR_4);
             Motor_Dir_update(MACHINE_3,FORWARD);
-            Motor_Dir_update(MACHINE_3,BACKWARD);
-            Motor_Dir_update(MACHINE_3,LEFT);
-            Motor_Dir_update(MACHINE_3,RIGHT);
+            // Motor_Dir_update(MACHINE_3,BACKWARD);
+            // Motor_Dir_update(MACHINE_3,LEFT);
+            // Motor_Dir_update(MACHINE_3,RIGHT);
         }
         else if(gf_4 == BUTTON_STATE_HIGH)
         {
@@ -1106,9 +1106,9 @@ void Machine_processing_task(void *pvParameter)
             Ir_Sens_selection(IR_SENSOR_4);
             Ir_Sens_selection(IR_SENSOR_5);
             Motor_Dir_update(MACHINE_4,FORWARD);
-            Motor_Dir_update(MACHINE_4,BACKWARD);
-            Motor_Dir_update(MACHINE_4,LEFT);
-            Motor_Dir_update(MACHINE_4,RIGHT);
+            // Motor_Dir_update(MACHINE_4,BACKWARD);
+            // Motor_Dir_update(MACHINE_4,LEFT);
+            // Motor_Dir_update(MACHINE_4,RIGHT);
         }
         else if(gf_5 == BUTTON_STATE_HIGH)
         {
