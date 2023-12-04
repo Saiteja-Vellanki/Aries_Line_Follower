@@ -24,3 +24,7 @@ idf.py -p com14   eg
 
 idf.py -p com_port build flash monitor
 
+
+note: IR-> BLACK -> 1
+      IR-> WHITE -> 0
+
